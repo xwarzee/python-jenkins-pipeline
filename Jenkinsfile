@@ -29,6 +29,44 @@ pipeline {
                     '''
             }
         }
+
+        stage('Static code metrics') {
+            steps {
+                echo "Raw metrics"
+                sh  ''' source activate ${BUILD_TAG}
+                        radon raw --json irisvmpy > raw_report.json
+                        radon cc --json irisvmpy > cc_report.json
+                        radon mi --json irisvmpy > mi_report.json
+                    '''
+                        // sloccount implementation not found
+                        // sloccount --duplicates --wide irisvmpy > sloccount.sc
+                echo "Test coverage"
+                sh  ''' source activate ${BUILD_TAG}
+                        coverage run irisvmpy/iris.py 1 1 2 3
+                        python -m coverage xml -o reports/coverage.xml
+                    '''
+                echo "Style check"
+                sh  ''' source activate ${BUILD_TAG}
+                        pylint irisvmpy || true
+                    '''
+            }
+            post{
+                always{
+                    step([$class: 'CoberturaPublisher',
+                                   autoUpdateHealth: false,
+                                   autoUpdateStability: false,
+                                   coberturaReportFile: 'reports/coverage.xml',
+                                   failNoReports: false,
+                                   failUnhealthy: false,
+                                   failUnstable: false,
+                                   maxNumberOfBuilds: 10,
+                                   onlyStable: false,
+                                   sourceEncoding: 'ASCII',
+                                   zoomCoverageChart: false])
+                }
+            }
+        }
+        
         stage('Build') {
             steps {
                 sh '''source activate ${BUILD_TAG} 
@@ -36,7 +74,7 @@ pipeline {
                     '''
             }
         }
-        stage('Test') {
+        stage('Unit Tests') {
             steps {
                 sh '''source activate ${BUILD_TAG} 
                 py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py
