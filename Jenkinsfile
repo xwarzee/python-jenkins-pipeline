@@ -63,6 +63,10 @@ pipeline {
                                    onlyStable: false,
                                    sourceEncoding: 'ASCII',
                                    zoomCoverageChart: false])
+                    cucumber (buildStatus: 'SUCCESS',
+                        fileIncludePattern: '**/*.json',
+                        jsonReportDirectory: './reports/',
+                        sortingMethod: 'ALPHABETICAL')
                 }
             }
         }
