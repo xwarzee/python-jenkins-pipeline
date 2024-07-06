@@ -34,20 +34,20 @@ pipeline {
             steps {
                 echo "Raw metrics"
                 sh  ''' source activate ${BUILD_TAG}
-                        radon raw --json irisvmpy > raw_report.json
-                        radon cc --json irisvmpy > cc_report.json
-                        radon mi --json irisvmpy > mi_report.json
+                        radon raw --json sources > raw_report.json
+                        radon cc --json sources > cc_report.json
+                        radon mi --json sources > mi_report.json
                     '''
                         // sloccount implementation not found
-                        // sloccount --duplicates --wide irisvmpy > sloccount.sc
+                        // sloccount --duplicates --wide sources > sloccount.sc
                 echo "Test coverage"
                 sh  ''' source activate ${BUILD_TAG}
-                        coverage run irisvmpy/iris.py 1 1 2 3
+                        coverage run sources/add2vals.py
                         python -m coverage xml -o reports/coverage.xml
                     '''
                 echo "Style check"
                 sh  ''' source activate ${BUILD_TAG}
-                        pylint irisvmpy || true
+                        pylint sources || true
                     '''
             }
             post{
