@@ -42,7 +42,7 @@ pipeline {
                         // sloccount --duplicates --wide sources > sloccount.sc
                 echo "Test coverage"
                 sh  ''' source activate ${BUILD_TAG}
-                        coverage run sources/add2vals.py 2 5
+                        coverage run -m pytest sources/test_calc.py
                         python -m coverage xml -o reports/coverage.xml
                     '''
                 echo "Style check"
