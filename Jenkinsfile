@@ -29,12 +29,10 @@ pipeline {
                     '''
             }
         }
-        stage('Test environment') {
+        stage('Build') {
             steps {
                 sh '''source activate ${BUILD_TAG} 
-                      pip list
-                      which pip
-                      which python
+                      python -m py_compile sources/add2vals.py sources/calc.py
                     '''
             }
         }
