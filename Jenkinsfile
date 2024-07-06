@@ -36,6 +36,18 @@ pipeline {
                     '''
             }
         }
+        stage('Test') {
+            steps {
+                sh '''source activate ${BUILD_TAG} 
+                py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py
+                '''
+            }
+            post {
+                always {
+                    junit 'test-reports/results.xml'
+                }
+            }
+        }
     }
     post {
         always {
